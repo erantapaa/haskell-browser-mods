@@ -1,0 +1,28 @@
+{
+  "name": "hdiff-fu",
+  "version": "0.1.0.4",
+  "description": "Enhancements to hdiff",
+
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+
+  "homepage_url": "https://github.com/statusfailed/hackage-fu",
+
+  "content_scripts": [
+  { "js": [ "hdiff.js" ],
+    "matches": [ "*://hdiff.luite.com/cgit*" ],
+    "run_at": "document_end"
+  },
+  { "js": [ "jquery.min.js", "hackage.js" ],
+    "matches": [ "*://hackage.haskell.org/package/*" ],
+    "run_at": "document_end"
+  }
+  ],
+
+  "permissions": [ "tabs", "*://hdiff.luite/cgit*", "*://hackage.haskell.org/*" ],
+
+  "manifest_version": 2
+}
