@@ -159,7 +159,7 @@ function change_source_repo_link() {
     });
 }
 
-function contents_page(m) {
+function visiting_contents_page(m) {
   // perform actions on a package's contents page
   //
   // m.package, m.version contain the package name and version
@@ -286,6 +286,35 @@ function find_latest_docs(loc, onSuccess, onFailure) {
 
 }
 
+function insert_script(url) {
+  var script = document.createElement('script')
+  script.src = url
+  script.type = "text/javascript"
+  document.head.appendChild(script)
+}
+
+function insert_css(url) {
+  var link = document.createElement('link')
+  link.rel = "stylesheet"
+  link.type = "text/css"
+  link.href = url
+  document.head.appendChild(link)
+}
+
+function visiting_doc_index(loc) {
+  // inject the following tags:
+  //  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  //  <link rel="stylesheet" type="text/css" href="awesomplete.css">
+  //  <script src="awesomplete.js"></script>
+  //  <script src="main.js"></script>
+  console.log("=== in visiting_doc_index")
+  var baseurl = "http://erantapaa.github.io/haskell-browser-mods/"
+  insert_script("https://code.jquery.com/jquery-1.12.4.min.js")
+  insert_css(baseurl + "awesomplete.css")
+  insert_script(baseurl + "awesomplete.js")
+  insert_script(baseurl + "main.js")
+}
+
 function main() {
   var loc = parse_full_url(window.location.href)
   console.log(loc)
@@ -297,8 +326,9 @@ function main() {
     } else {
       loc2 = loc
     }
-    contents_page(loc2)
-
+    visiting_contents_page(loc2)
+  } else if (loc.area == "doc-index") {
+    visiting_doc_index(loc)
   }
 }
 

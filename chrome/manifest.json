@@ -1,7 +1,7 @@
 {
-  "name": "hdiff-fu",
+  "name": "haskell-browser-mods",
   "version": "0.1.0.4",
-  "description": "Enhancements to hdiff",
+  "description": "Enhancements to Haskell-related websites",
 
   "icons": {
     "16": "icon16.png",
