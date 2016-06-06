@@ -22,8 +22,9 @@ function update_items() {
 
 (function() {
   var old_setInterval = window.setInterval;
-  window.setInterval = function() { return 10 };
+  window.setInterval = function() { console.log("--- setInterval called"); return 10 };
   var last = old_setInterval(";", 1000);
+  console.log("--- last:", last)
   for (var i = 0; i <= last; i++) { clearInterval(i); }
   old_setInterval(update_items, 20*1000);
   old_setInterval(refreshDates, 1000);

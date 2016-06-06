@@ -3,7 +3,7 @@
 # Build hn.js from hn.js.inc
 
 sub main {
-  process_file("hn.in", "hn.js");
+  # process_file("hn.in", "hn.js");
   process_file("haddock-index.in", "haddock-index.js")
 }
 
