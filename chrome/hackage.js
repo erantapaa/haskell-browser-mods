@@ -28,7 +28,7 @@ function parse_url(url) {
   // return an object with the following keys:
   //
   // area:      either: contents, docs-src, docs-mod, doc-index, doc-index-all
-  //                    src, unknown 
+  //                    src, unknown
   // package:   parsed package name
   // version:   parsed version name (may be empty)
   // fragment:  url fragment (#...)
@@ -150,7 +150,7 @@ function scrape_package_versions() {
     return (this.textContent == "Versions")
   };
 
-  var vstr = 
+  var vstr =
   $("table.properties th")
     .filter( isVersions )
     .first()
@@ -226,7 +226,7 @@ function visiting_contents_page(m) {
   console.log("rev_anchor:", rev_anchor)
   console.log("hdiff_anchor:", hdiff_anchor)
 
-  var inner = rev_anchor + '&nbsp;' + hdiff_anchor 
+  var inner = rev_anchor + '&nbsp;' + hdiff_anchor
   $("table.properties tbody").append(
    '<tr><th>Additional Info</th><td>' + inner + '</td></tr>'
   )
@@ -254,7 +254,7 @@ function add_doc_index_control(loc) {
   $("table.properties tbody").append(
    '<tr><th>Doc Index Links</th><td id="doc-index-cell"> (Pending)</td></tr>'
   )
-  
+
   var success = function(found) {
 
     var url = doc_index_url(found)
@@ -320,7 +320,7 @@ function check_list(versions, i, onSuccess, onFailure) {
   };
 
 function find_latest_docs(loc, get_versions, onSuccess, onFailure) {
- 
+
   var tryOthers = function () {
       var versions= get_versions()
       var locs = []
@@ -374,14 +374,17 @@ function visiting_doc_index(loc) {
 }
 
 function visiting_docs_mod(loc) {
-  // are we on a Page Not Found?
+  // do nothing for now
+}
+
+function on_not_found_page(loc) {
   var h1_text = $("#content h1").first().text()
   console.log("h1_text:", h1_text)
   if (h1_text.match(/Package not found/i)) {
-    return;
-  } else if (h1_text.match(/Not found/i)) {
-    // package found, but docs for version don't exist
+    return false;  // not able to handle this right now
+  }
 
+  if (h1_text.match(/Not found/i)) {
     var presentAlternative = function(alt) {
       // insert a new div at the end
       var html = "Alternative links:<ul><li>@link1 <li>@link2 </ul>"
@@ -399,8 +402,7 @@ function visiting_docs_mod(loc) {
       $("#content").append(div)
     };
     find_alternative_docs(loc, presentAlternative, reportFailure)
-  } else {
-    // do nothing for now
+    return True;  // signal that we're handling it
   }
 }
 
@@ -453,7 +455,17 @@ function main() {
       loc2 = loc
     }
     visiting_contents_page(loc2)
-  } else if (loc.area == "doc-index") {
+    return
+  }
+
+  if (loc.area == "doc-index" || loc.area == "docs-mod" || loc.area == "docs-src") {
+    // check if we're on a Not found page
+    if (on_not_found_page(loc)) {
+      return; // do not run normal visiting functions
+    }
+  }
+
+ if (loc.area == "doc-index") {
     console.log("in docs-index")
     visiting_doc_index(loc)
   } else if (loc.area == "docs-mod") {

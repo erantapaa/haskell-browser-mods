@@ -25,6 +25,8 @@ On `hackage.haskell.org`:
 * Link added to the doc index page (either `doc-index-All.html` if that exists or `doc-index.html`)
 * Source Repository links of the form `git://github.com/...` are now clickable
 * On index pages, pressing ESC brings up an autocomplete search box for searching the page.
+* On 'Not Found' doc pages, a link to the corresponding page for the latest
+  version of the package having docs is presented.
 
 On `haskellnews.org`:
 
