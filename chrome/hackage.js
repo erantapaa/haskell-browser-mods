@@ -178,9 +178,8 @@ function visiting_contents_page(m) {
     docs = "/package/" + m.package + "/docs/doc-index-All.html"
   }
 
-  var rev_anchor = '<a href="' + revurl + '">(rev-depends)</a>'
-  var hdiff_anchor = '<a href="' + hdiff + '">(hdiff)</a>'
-  var doc_anchor = '<a href="' + docs + '">(docs)</a>'
+  var rev_anchor = atag(revurl, '(rev-depends)')
+  var hdiff_anchor = atag(hdiff, '(hdiff)')
 
   console.log("rev_anchor:", rev_anchor)
   console.log("hdiff_anchor:", hdiff_anchor)
@@ -194,14 +193,19 @@ function visiting_contents_page(m) {
   add_doc_index_control(m)
 }
 
+function atag(url, inner) {
+  return "<a href='" + url + "'>" + inner + "</a>"
+}
+
 function fmt_doc_cell(loc, found, which, url) {
   var label;
   if (loc.version == found.version) {
     label = "Current version"
   } else {
-    label = "Version " + found.version
+    var u = "http://hackage.haskell.org/package/" + found.package + "-" + found.version
+    label = "Version " + atag(u, found.version )
   }
-  return label + ": <a href='" + url + "'>" + which + "</a>"
+  return label + ": " + atag(url, which)
 }
 
 function add_doc_index_control(loc) {
