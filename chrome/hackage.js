@@ -33,6 +33,8 @@ function parse_url(url) {
   // version:   parsed version name (may be empty)
   // fragment:  url fragment (#...)
   //
+  // rest:      parts [2..]
+  //
   // assume url has been stripped of protocol and domain.
 
   // remove the fragment
@@ -61,6 +63,9 @@ function parse_url(url) {
     loc.package = pkgvers
     loc.version = ""
   }
+
+  // all the parts beyond the package-version part
+  loc.rest = parts.slice(2).join("/") + loc.fragment
 
   if (parts.length < 3) {
     loc.area = "contents"
@@ -101,8 +106,45 @@ function pkgver_from_html() {
   return
 }
 
+function FetchUrl(url, onDone) {
+
+    var http = new XMLHttpRequest();
+    http.open('GET', url);
+    http.onreadystatechange = function() {
+        if (this.readyState == this.DONE) {
+            onDone(this)
+        }
+    };
+    http.send();
+}
+
+
+function fetch_package_versions(package, onSuccess, onFailure) {
+  var href = window.location.href
+  var proto = href.split(':', 2)[0]
+  var url = proto + "://hackage.haskell.org/package/" + package
+  console.log("fetch_package_versions url:", url)
+
+  FetchUrl(url, function(xhr) {
+    var rtext = xhr.responseText
+    console.log("xhr.status:", xhr.status)
+    if (xhr.status == 200) {
+      var re = new RegExp('href="/package/' + package + '-([0-9][0-9.]*)"', 'g')
+      var matches = []
+      var m;
+      while (m = re.exec(rtext)) {
+        matches.push(m[1]+"")
+      }
+      onSuccess(matches)
+    } else {
+      onFailure("status: " + xhr.status)
+    }
+  })
+
+}
+
 function scrape_package_versions() {
-  // extract all versions from the Versions row
+  // extract all versions from the Versions row (on the current page)
 
   var isVersions = function(i,e) {
     return (this.textContent == "Versions")
@@ -231,11 +273,15 @@ function add_doc_index_control(loc) {
     $("#doc-index-cell").html("No documentation found for any version")
   }
 
-  find_latest_docs(loc,success, failure)
+  var get_docs = function() {
+    return scrape_package_versions().reverse()
+  };
+
+  find_latest_docs(loc, get_docs, success, failure)
 }
 
 function doc_index_url(loc, section) {
-  var url = "http://hackage.haskell.org/package/" + loc.package + "-" + loc.version + "/docs/doc-index" + (section ? "-" + section : "") + ".html"
+  var url = "/package/" + loc.package + "-" + loc.version + "/docs/doc-index" + (section ? "-" + section : "") + ".html"
   return url;
 }
 
@@ -255,16 +301,14 @@ function UrlExists(url, onSuccess, onFailure)
     http.send();
 }
 
-
-function find_latest_docs(loc, onSuccess, onFailure) {
-
-  var check_version = function(m, onSuccess, onFailure) {
-    var url = doc_index_url(m)
+function check_version(loc, onSuccess, onFailure) {
+    var url = doc_index_url(loc)
     console.log("--- check_version trying: ", url)
-    UrlExists(url, function() { onSuccess(m) }, onFailure)
+    UrlExists(url, function() { onSuccess(loc) }, onFailure)
   };
 
-  var check_list = function(versions, i, onSuccess, onFailure) {
+function check_list(versions, i, onSuccess, onFailure) {
+    console.log("in check_list")
     if (i >= versions.length) {
       onFailure()
     } else {
@@ -275,34 +319,20 @@ function find_latest_docs(loc, onSuccess, onFailure) {
     }
   };
 
-  // kick everything off
-  check_version(loc, onSuccess,
-    function() {
-      var versions = scrape_package_versions().reverse()
-      // console.log("--- versions:", versions)
+function find_latest_docs(loc, get_versions, onSuccess, onFailure) {
+ 
+  var tryOthers = function () {
+      var versions= get_versions()
       var locs = []
       for (var i = 0; i < versions.length; i++) {
         locs.push( { package: loc.package, version: versions[i] } )
       }
-      // console.log("--- locs = ", locs)
       check_list(locs, 0, onSuccess, onFailure)
-    });
+    };
 
-}
+  // kick everything off
 
-function old_insert_script(url) {
-  var script = document.createElement('script')
-  script.src = url
-  script.type = "text/javascript"
-  document.head.appendChild(script)
-}
-
-function old_insert_css(url) {
-  var link = document.createElement('link')
-  link.rel = "stylesheet"
-  link.type = "text/css"
-  link.href = url
-  document.head.appendChild(link)
+  check_version(loc, onSuccess, tryOthers)
 }
 
 function insert_script(resource) {
@@ -321,17 +351,94 @@ function insert_css(resource) {
 }
 
 function visiting_doc_index(loc) {
-  // inject the following tags:
-  //  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-  //  <link rel="stylesheet" type="text/css" href="awesomplete.css">
-  //  <script src="awesomplete.js"></script>
-  //  <script src="main.js"></script>
-  console.log("=== in visiting_doc_index")
-  var baseurl = "http://erantapaa.github.io/haskell-browser-mods/"
-  // insert_script("https://code.jquery.com/jquery-1.12.4.min.js")
-  insert_script("jquery-1.12.4.min.js")
-  insert_css("awesomplete.css")
-  insert_script("haddock-index.js")
+  // are we on a Page Not Found?
+  var h1_text = $("#content h1").first().text()
+  console.log("h1_text:", h1_text)
+
+  if (h1_text.match(/Package not found/i)) {
+    return; // package not found
+  } else if (h1_text.match(/Not Found/i)) {
+    // version was not found.
+    return;
+  } else {
+    // inject the following tags:
+    //  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    //  <link rel="stylesheet" type="text/css" href="awesomplete.css">
+    //  <script src="awesomplete.js"></script>
+    //  <script src="main.js"></script>
+    console.log("=== in visiting_doc_index")
+    insert_script("jquery-1.12.4.min.js")
+    insert_css("awesomplete.css")
+    insert_script("haddock-index.js")
+  }
+}
+
+function visiting_docs_mod(loc) {
+  // are we on a Page Not Found?
+  var h1_text = $("#content h1").first().text()
+  console.log("h1_text:", h1_text)
+  if (h1_text.match(/Package not found/i)) {
+    return;
+  } else if (h1_text.match(/Not found/i)) {
+    // package found, but docs for version don't exist
+
+    var presentAlternative = function(alt) {
+      // insert a new div at the end
+      var html = "Alternative links:<ul><li>@link1 <li>@link2 </ul>"
+      var p = loc.package
+      var v = alt.version
+      var contents_url = "/package/"+p+"-"+v
+      var dest_url     = "/package/"+p+"-"+v+ "/" + loc.rest
+      var link1 = atag(dest_url, dest_url)
+      var link2 = atag(contents_url, contents_url)
+      html = html.replace('@link1', link1)
+      html = html.replace('@link2', link2)
+      console.log("html:", html)
+      var div = document.createElement('div')
+      div.innerHTML = html
+      $("#content").append(div)
+    };
+    find_alternative_docs(loc, presentAlternative, reportFailure)
+  } else {
+    // do nothing for now
+  }
+}
+
+function reportFailure(msg) {
+  console.log("failed:", msg)
+}
+
+function reportConsole(msg) {
+  console.log("succeeded:", msg)
+}
+
+function find_alternative_docs(loc, onSuccess, onFailure) {
+  // package is ok
+  console.log("in find_alternative_docs")
+
+  fetch_package_versions(
+    loc.package,
+    function(versions) {
+      console.log("versions:", versions)
+      var locs = []
+      for (var i = versions.length-1; i >= 0; i--) {
+        locs.push( { package: loc.package, version: versions[i] } )
+      }
+      check_list(locs, 0, onSuccess, onFailure)
+    },
+    onFailure
+  )
+}
+
+function xfind_latest_docs(loc, onSuccess, onFailure) {
+  var get_vers = function(onSuccess) {
+                   fetch_package_versions(
+                     loc.package,
+                     function(versions) { onSuccess(versions.reverse()) },
+                     onFailure)
+  }
+
+  find_latest_docs(loc, get_vers, onSuccess, onFailure);
 }
 
 function main() {
@@ -347,7 +454,11 @@ function main() {
     }
     visiting_contents_page(loc2)
   } else if (loc.area == "doc-index") {
+    console.log("in docs-index")
     visiting_doc_index(loc)
+  } else if (loc.area == "docs-mod") {
+    console.log("in docs-mods")
+    visiting_docs_mod(loc);
   }
 }
 
