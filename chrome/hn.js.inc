@@ -2,7 +2,7 @@
 var script = document.createElement('script');
 
 var js ='\
-@include hn-injected.js
+@inject hn-injected.js
 ';
 
 var code = document.createTextNode(js)

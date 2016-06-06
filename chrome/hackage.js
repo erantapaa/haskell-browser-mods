@@ -1,20 +1,88 @@
 
-console.log("here in hackage.js")
+// console.log("here in hackage.js")
 
-function pkgver_from_url(url) {
-  // determine the package from the url
-  // e.g.: http://hackage.haskell.org/package/text-1.2.0.4
-  var m = url.match(/hackage.haskell.org\/package\/([^\/]+)-(\d[\d\.]*)/)
-  if (m) {
-    console.log("m:", m)
-    console.log("package:", m[1], "version:", m[2])
-    return { package: m[1], version: m[2], pkgversion: m[1] + "-" + m[2]  }
+function url_path(url) {
+  // trim the protocol and domain from the front of a url
+
+  if (url.match(/^\//)) {
+    return url.replace(/^\//, "");
   }
-  m = url.match(/hackage.haskell.org\/package\/([^\/]+)/)
-  if (m) {
-    return { package: m[1], version: "" }
+  return url.replace(/^https?:\/\/([^\/]+)\/?/, "");
+}
+
+// parse a module name which appears as a leaf name of a url
+function parse_modname(part) {
+  if (part.endsWith(".html")) {
+    var name = part.slice(0, -5).replace('-','.')
+    return name
   }
-  return
+  return ""
+}
+
+function parse_full_url(full_url) {
+  var url = url_path(full_url)
+  return parse_url(url)
+}
+
+function parse_url(url) {
+  // return an object with the following keys:
+  //
+  // area:      either: contents, docs-src, docs-mod, doc-index, doc-index-all
+  //                    src, unknown 
+  // package:   parsed package name
+  // version:   parsed version name (may be empty)
+  // fragment:  url fragment (#...)
+  //
+  // assume url has been stripped of protocol and domain.
+
+  // remove the fragment
+  var fparts = url.split('#',2)
+  var frag = (fparts.length > 1) ? '#' + fparts[1] : ""
+
+  var url0 = fparts[0]
+  var parts = url0.split('/')
+  if (parts[0] != 'package') {
+    return undefined
+  }
+
+  // Example:
+  //
+  // url:   package/arithmoi-0.4.2.0/docs/Math-NumberTheory-Powers-Fourth.html
+  // parts:   0           1           2      3
+
+  var loc = {}
+  loc.fragment = frag
+  var pkgvers = parts[1]
+  var m = pkgvers.match(/^(.*)-(\d[\d\.]*)$/);
+  if (m) {
+    loc.package = m[1]
+    loc.version = m[2]
+  } else {
+    loc.package = pkgvers
+    loc.version = ""
+  }
+
+  if (parts.length < 3) {
+    loc.area = "contents"
+  } else if (parts.length >= 3) {
+      var x = parts[3]
+      if (x == "src") {
+        loc.area = "docs-src"
+        loc.module = parse_modname(parts[4])
+      } else if (d = x.match(/^doc-index(?:-(.*))?\.html$/)) {
+        loc.area = "doc-index"
+        loc.subarea = d[1] && d[1].length ? d[1] : ""
+      } else if (x.endsWith(".html")) {
+        loc.area = "docs-mod"
+        loc.module = parse_modname(x)
+      }
+  } else if (parts[2] == 'src') {
+    loc.area = "src"
+  } else {
+    loc.area = "unknown"
+    loc.part2 = parts[2]
+  }
+  return loc
 }
 
 function pkgver_from_html() {
@@ -24,7 +92,7 @@ function pkgver_from_html() {
   var dl_anchors = $("div#downloads a").map(function() { return this.href }).get()
   var m;
   for (var i = 0; i < dl_anchors.length; i++) {
-    var m = pkgver_from_url( dl_anchors[i] )
+    var m = parse_full_url( dl_anchors[i] )
     if (m && m.version) {
       console.log("determined m:", m)
       return m
@@ -51,7 +119,6 @@ function all_versions() {
       console.log("versions: ", txt)
     }
   });
-
 }
 
 function add_reverse_depends() {
@@ -61,7 +128,7 @@ function add_reverse_depends() {
   pkgver_from_html()
 
   var url = window.location.href
-  var m = pkgver_from_url(url)
+  var m = parse_full_url(url)
   if (!m || !m.version) {
     m = pkgver_from_html()
   }
@@ -95,5 +162,14 @@ function add_reverse_depends() {
   }
 }
 
-add_reverse_depends()
+function main() {
+  add_reverse_depends()
+}
+
+module.exports = {
+  url_path: url_path,
+  parse_url: parse_url,
+  parse_full_url: parse_full_url,
+  parse_modname: parse_modname
+}
 

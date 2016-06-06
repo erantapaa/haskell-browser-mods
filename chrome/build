@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+#
+# Build hn.js from hn.js.inc
 
 sub main {
   process_file("hn.js.inc", "hn.js");
@@ -10,7 +12,7 @@ sub process_file {
   open(my $out, ">", $dest) or die "unable to write $dest: $!\n";
   warn "building $dest from $source\n";
   while (<$in>) {
-    if (m/^\@include (\S+)/) {
+    if (m/^\@inject\s+(\S+)/) {
       include_file($1, $out);
     } else {
       print {$out} $_;
@@ -20,7 +22,7 @@ sub process_file {
 
 sub include_file {
   my ($path, $out) = @_;
-  warn " - including: $path\n";
+  warn " - injecting: $path\n";
   open(my $fh, "<", $path) || die "unable to read $path: $!\n";
   while (<$fh>) {
     chomp;
