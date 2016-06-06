@@ -286,18 +286,33 @@ function find_latest_docs(loc, onSuccess, onFailure) {
 
 }
 
-function insert_script(url) {
+function old_insert_script(url) {
   var script = document.createElement('script')
   script.src = url
   script.type = "text/javascript"
   document.head.appendChild(script)
 }
 
-function insert_css(url) {
+function old_insert_css(url) {
   var link = document.createElement('link')
   link.rel = "stylesheet"
   link.type = "text/css"
   link.href = url
+  document.head.appendChild(link)
+}
+
+function insert_script(resource) {
+  var s = document.createElement('script');
+  s.src = chrome.extension.getURL(resource);
+  // s.onload = function() { this.parentNode.removeChild(this); };
+  document.head.appendChild(s);
+}
+
+function insert_css(resource) {
+  var link = document.createElement('link')
+  link.rel = "stylesheet"
+  link.type = "text/css"
+  link.href = chrome.extension.getURL(resource)
   document.head.appendChild(link)
 }
 
@@ -309,10 +324,10 @@ function visiting_doc_index(loc) {
   //  <script src="main.js"></script>
   console.log("=== in visiting_doc_index")
   var baseurl = "http://erantapaa.github.io/haskell-browser-mods/"
-  insert_script("https://code.jquery.com/jquery-1.12.4.min.js")
-  insert_css(baseurl + "awesomplete.css")
-  insert_script(baseurl + "awesomplete.js")
-  insert_script(baseurl + "main.js")
+  // insert_script("https://code.jquery.com/jquery-1.12.4.min.js")
+  insert_script("jquery-1.12.4.min.js")
+  insert_css("awesomplete.css")
+  insert_script("haddock-index.js")
 }
 
 function main() {

@@ -11,6 +11,12 @@
 
   "homepage_url": "https://github.com/statusfailed/hackage-fu",
 
+  "web_accessible_resources": [
+    "haddock-index.js",
+    "awesomplete.css",
+    "jquery-1.12.4.min.js"
+  ],
+
   "content_scripts": [
   { "js": [ "hdiff.js" ],
     "matches": [ "*://hdiff.luite.com/cgit*" ],
