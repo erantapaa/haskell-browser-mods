@@ -101,24 +101,28 @@ function pkgver_from_html() {
   return
 }
 
-function all_versions() {
+function scrape_package_versions() {
   // extract all versions from the Versions row
 
-  $("table.properties th").filter( function(i) {
-    // console.log("this:", this, ">" + this.textContent + "<")
+  var isVersions = function(i,e) {
     return (this.textContent == "Versions")
-  }).first().each(function(i,e) {
-    var td = this.nextSibling
-    while (td && td.tagName != "TD") {
-      td = td.nextSibling
-    }
-    console.log("td:", td)
-    console.log("e:", e, "e.next:", e.nextSibling)
-    if (td) {
-      var txt = td.textContent
-      console.log("versions: ", txt)
-    }
-  });
+  };
+
+  var vstr = 
+  $("table.properties th")
+    .filter( isVersions )
+    .first()
+    .siblings("td")
+    .first()
+    .text()
+  ;
+  var versions;
+  if (vstr) {
+    versions = vstr.match(/(\d[\d\.]+)/g)
+  } else {
+    versions = []
+  }
+  return versions
 }
 
 function change_source_repo_link() {
@@ -142,11 +146,9 @@ function change_source_repo_link() {
     // .find("a") .each(function(i,e) { console.log("--- and this a:", this) })
     .find("a[href*='git://github.com/']")
     .each(function(i,e) {
-      console.log("found source repo href:", this.href)
       var href = this.href
       if (href.match(/^git:/)) {
         this.href = href.replace(/^git:/, "https:")
-        console.log("--- replaced git:// with https://")
         // insert a new text node
         var txt = document.createTextNode(this.href)
 
@@ -183,12 +185,105 @@ function contents_page(m) {
   console.log("rev_anchor:", rev_anchor)
   console.log("hdiff_anchor:", hdiff_anchor)
 
-  var inner = rev_anchor + '&nbsp;' + hdiff_anchor + '&nbsp;' + doc_anchor
+  var inner = rev_anchor + '&nbsp;' + hdiff_anchor 
   $("table.properties tbody").append(
    '<tr><th>Additional Info</th><td>' + inner + '</td></tr>'
   )
 
   change_source_repo_link()
+  add_doc_index_control(m)
+}
+
+function fmt_doc_cell(loc, found, which, url) {
+  var label;
+  if (loc.version == found.version) {
+    label = "Current version"
+  } else {
+    label = "Version " + found.version
+  }
+  return label + ": <a href='" + url + "'>" + which + "</a>"
+}
+
+function add_doc_index_control(loc) {
+  $("table.properties tbody").append(
+   '<tr><th>Doc Index Links</th><td id="doc-index-cell"> (Pending)</td></tr>'
+  )
+  
+  var success = function(found) {
+
+    var url = doc_index_url(found)
+    $("#doc-index-cell").html(fmt_doc_cell(loc, found, "Index", url))
+
+    var all_url = doc_index_url(found, "All")
+    UrlExists(all_url,
+      function() {
+        $("#doc-index-cell").html( fmt_doc_cell(loc, found, "All Index", all_url) )
+      },
+      function() {}
+    )
+  };
+
+  var failure = function() {
+    $("#doc-index-cell").html("No documentation found for any version")
+  }
+
+  find_latest_docs(loc,success, failure)
+}
+
+function doc_index_url(loc, section) {
+  var url = "http://hackage.haskell.org/package/" + loc.package + "-" + loc.version + "/docs/doc-index" + (section ? "-" + section : "") + ".html"
+  return url;
+}
+
+function UrlExists(url, onSuccess, onFailure)
+{
+    var http = new XMLHttpRequest();
+    http.open('HEAD', url);
+    http.onreadystatechange = function() {
+        if (this.readyState == this.DONE) {
+            if (this.status == 200) {
+              onSuccess()
+            } else {
+              onFailure()
+            }
+        }
+    };
+    http.send();
+}
+
+
+function find_latest_docs(loc, onSuccess, onFailure) {
+
+  var check_version = function(m, onSuccess, onFailure) {
+    var url = doc_index_url(m)
+    console.log("--- check_version trying: ", url)
+    UrlExists(url, function() { onSuccess(m) }, onFailure)
+  };
+
+  var check_list = function(versions, i, onSuccess, onFailure) {
+    if (i >= versions.length) {
+      onFailure()
+    } else {
+      var loc = versions[i]
+      check_version(loc, onSuccess, function() {
+        check_list(versions, i+1, onSuccess, onFailure)
+      })
+    }
+  };
+
+  // kick everything off
+  check_version(loc, onSuccess,
+    function() {
+      var versions = scrape_package_versions().reverse()
+      // console.log("--- versions:", versions)
+      var locs = []
+      for (var i = 0; i < versions.length; i++) {
+        locs.push( { package: loc.package, version: versions[i] } )
+      }
+      // console.log("--- locs = ", locs)
+      check_list(locs, 0, onSuccess, onFailure)
+    });
+
 }
 
 function main() {
@@ -203,6 +298,7 @@ function main() {
       loc2 = loc
     }
     contents_page(loc2)
+
   }
 }
 
