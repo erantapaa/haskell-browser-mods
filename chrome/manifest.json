@@ -19,10 +19,18 @@
   { "js": [ "jquery.min.js", "hackage.js" ],
     "matches": [ "*://hackage.haskell.org/package/*" ],
     "run_at": "document_end"
+  },
+  { "js": [ "jquery.min.js", "hn.js" ],
+    "matches": [ "*://haskellnews.org/*" ],
+    "run_at": "document_end"
   }
   ],
 
-  "permissions": [ "tabs", "*://hdiff.luite/cgit*", "*://hackage.haskell.org/*" ],
+  "permissions": [ "tabs",
+                   "*://hdiff.luite/cgit*",
+                   "*://hackage.haskell.org/*",
+                   "*://haskellnews.org/*"
+                 ],
 
   "manifest_version": 2
 }

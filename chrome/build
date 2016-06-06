@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+
+sub main {
+  process_file("hn.js.inc", "hn.js");
+}
+
+sub process_file {
+  my ($source, $dest) = @_;
+  open(my $in, "<", $source) or die "unable to read $source: $!\n";
+  open(my $out, ">", $dest) or die "unable to write $dest: $!\n";
+  warn "building $dest from $source\n";
+  while (<$in>) {
+    if (m/^\@include (\S+)/) {
+      include_file($1, $out);
+    } else {
+      print {$out} $_;
+    }
+  }
+}
+
+sub include_file {
+  my ($path, $out) = @_;
+  warn " - including: $path\n";
+  open(my $fh, "<", $path) || die "unable to read $path: $!\n";
+  while (<$fh>) {
+    chomp;
+    s/'/\\'/g;
+    print {$out} "$_ \\\n";
+  }
+}
+
+main();
+
