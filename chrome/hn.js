@@ -7,6 +7,5 @@ function insert_script(resource) {
 }
 
 insert_script("hn-injected.js")
-
 console.log("=== done in hn.js")
 
