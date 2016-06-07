@@ -250,7 +250,10 @@ function visiting_contents_page(m) {
     select.value = loc.version
     select.onchange = function() {
       var v = this.value
-      var url = "http://hdiff.luite.com/cgit/" + loc.package + "/diff/?id=" + loc.version + "&id2=" + v
+      var url = "http://hdiff.luite.com/cgit/" + loc.package + "/diff/?id=" + loc.version
+      if (v.length) {
+        url += "&id2=" + v
+      }
       console.log("hdiff url:", url)
       window.location.href = url
     }
@@ -282,6 +285,12 @@ function build_hdiff_options(loc, versions) {
     } else {
       opt.innerHTML = versions[i]
     }
+    select.appendChild(opt)
+  }
+  if (0) { // not ready for this yet
+    var opt = document.createElement("option")
+    opt.value=""
+    opt.innerHTML = "(empty repo)"
     select.appendChild(opt)
   }
   return select
