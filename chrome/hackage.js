@@ -143,6 +143,14 @@ function fetch_package_versions(package, onSuccess, onFailure) {
 
 }
 
+function cached_versions(loc) {
+  if (!loc.versions) {
+    console.log("scraping versions")
+    loc.versions = scrape_package_versions()
+  }
+  return loc.versions
+}
+
 function scrape_package_versions() {
   // extract all versions from the Versions row (on the current page)
 
@@ -167,11 +175,11 @@ function scrape_package_versions() {
   return versions
 }
 
-function change_source_repo_link() {
+function fixup_source_repo_link() {
   // on the contents page, if the Source Repository
   // is a git://github.com/... link, change it to http://github.com/...
 
-  console.log("in change_source_repo_link")
+  console.log("in fixup_source_repo_link")
 
   var isSourceRepo = function(i,e) {
     return (this.textContent == "Source repository")
@@ -202,22 +210,23 @@ function change_source_repo_link() {
 }
 
 function visiting_contents_page(m) {
+  var loc = m
   // perform actions on a package's contents page
   //
   // m.package, m.version contain the package name and version
 
-  var revurl = "http://packdeps.haskellers.com/reverse/" + m.package
+  var revurl = "http://packdeps.haskellers.com/reverse/" + loc.package
   var hdiff;
-  if (m.version) {
-    hdiff = "http://hdiff.luite.com/cgit/"+m.package+"/diff/?tag="+m.version
+  if (loc.version) {
+    hdiff = "http://hdiff.luite.com/cgit/"+loc.package+"/diff/?id="+loc.version
   } else {
-    hdiff = "http://hdiff.luite.com/cgit/"+m.package+"/diff"
+    hdiff = "http://hdiff.luite.com/cgit/"+loc.package+"/diff"
   }
   var docs;
-  if (m.version) {
-    docs = "/package/" + m.package + "-" + m.version + "/docs/doc-index-All.html"
+  if (loc.version) {
+    docs = "/package/" + loc.package + "-" + loc.version + "/docs/doc-index-All.html"
   } else {
-    docs = "/package/" + m.package + "/docs/doc-index-All.html"
+    docs = "/package/" + loc.package + "/docs/doc-index-All.html"
   }
 
   var rev_anchor = atag(revurl, '(rev-depends)')
@@ -226,13 +235,56 @@ function visiting_contents_page(m) {
   console.log("rev_anchor:", rev_anchor)
   console.log("hdiff_anchor:", hdiff_anchor)
 
-  var inner = rev_anchor + '&nbsp;' + hdiff_anchor
+  var inner = rev_anchor + '&nbsp;'
   $("table.properties tbody").append(
-   '<tr><th>Additional Info</th><td>' + inner + '</td></tr>'
+   '<tr><th>Additional Info</th><td id="hdiff-td">' + inner + '</td></tr>'
   )
 
-  change_source_repo_link()
-  add_doc_index_control(m)
+  var versions = cached_versions(loc)
+  if (versions.length) {
+    if (!loc.version) {
+      loc.version = versions[ versions.length-1 ]
+    }
+    // create select element
+    var select = build_hdiff_options(loc, versions)
+    select.value = loc.version
+    select.onchange = function() {
+      var v = this.value
+      var url = "http://hdiff.luite.com/cgit/" + loc.package + "/diff/?id=" + loc.version + "&id2=" + v
+      console.log("hdiff url:", url)
+      window.location.href = url
+    }
+    var txt = document.createTextNode("hdiff with: ")
+    $("#hdiff-td").append(txt).append(select)
+  } else {
+    console.log("no versions found")
+    // unable to parse any versions
+    var a = document.createElement("a")
+    a.href = hdiff
+    a.innerHTML = "(hdiff)"
+    $("#hdiff-td").append(a)
+  }
+
+  fixup_source_repo_link()
+  add_doc_index_control(loc)
+}
+
+function build_hdiff_options(loc, versions) {
+  // versions is the list of versions for this package
+  var pkg = loc.package
+  var prefix = "http://hdiff.luite.com/" + pkg + "/diff?id=" + loc.version
+  var select =  document.createElement("select")
+  for (var i = versions.length-1; i >= 0; i--) {
+    var opt = document.createElement("option")
+    opt.value = versions[i]
+    if (versions[i] == loc.version) {
+      opt.innerHTML = "(" + versions[i] + ")"
+    } else {
+      opt.innerHTML = versions[i]
+    }
+    select.appendChild(opt)
+  }
+  return select
 }
 
 function atag(url, inner) {
@@ -274,7 +326,7 @@ function add_doc_index_control(loc) {
   }
 
   var get_docs = function() {
-    return scrape_package_versions().reverse()
+    return cached_versions(loc).reverse()
   };
 
   find_latest_docs(loc, get_docs, success, failure)
