@@ -90,6 +90,31 @@ function parse_url(url) {
   return loc
 }
 
+function loc_package_base_url(loc) {
+  if (loc.version) {
+    return  "/package/" + loc.package + "-" + loc.version
+  } else {
+    return "/package/" + loc.package
+  }
+}
+
+function loc_doc_url(loc, subarea) {
+  if (subarea) {
+    return loc_package_base_url(loc) + "/docs/doc-index-" + subarea + ".html"
+  } else {
+    return loc_package_base_url(loc) + "/docs/doc-index.html"
+  }
+}
+
+function html_links_list(links) {
+  var html = "<ul>"
+  for (var i = 0; i < links.length; i++) {
+    html += "<li>" + atag(links[i].href, links[i].text)
+  }
+  html += "</ul>"
+  return html
+}
+
 function pkgver_from_html() {
   // determine the package-version from the contents page
   console.log("in pkgver_from_html")
@@ -173,6 +198,19 @@ function scrape_package_versions() {
     versions = []
   }
   return versions
+}
+
+function fixup_index_link(loc) {
+  var all_url = loc_doc_url(loc, "All")
+  // in div package-header look for doc-index.html
+  UrlExists(all_url, function() {
+                       console.log("fixup_index_link: updating Index url")
+                       $("a[href='doc-index.html']")
+                         .attr("href", "doc-index-All.html")
+                     },
+                     function() {
+                       console.log("did not find:", all_url)
+                     })
 }
 
 function fixup_source_repo_link() {
@@ -421,6 +459,14 @@ function visiting_doc_index(loc) {
   } else if (h1_text.match(/Not Found/i)) {
     // version was not found.
     return;
+  } else if ( $("div#alphabet").first().length ) {
+    // present link to index-All page
+    var url = loc_doc_url(loc, "All")
+    var links = [ { href: url, text: url } ]
+    var html = "Alternative links:" + html_links_list(links)
+    var div = document.createElement("div")
+    div.innerHTML = html
+    $("#content").append(div)
   } else {
     // inject the following tags:
     //  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -435,7 +481,9 @@ function visiting_doc_index(loc) {
 }
 
 function visiting_docs_mod(loc) {
-  // do nothing for now
+  // fixup the [Index] link
+  console.log("in visiting_docs_mod")
+  fixup_index_link(loc)
 }
 
 function on_not_found_page(loc) {
@@ -448,16 +496,17 @@ function on_not_found_page(loc) {
   if (h1_text.match(/Not found/i)) {
     var presentAlternative = function(alt) {
       // insert a new div at the end
-      var html = "Alternative links:<ul><li>@link1 <li>@link2 </ul>"
+
       var p = loc.package
       var v = alt.version
       var contents_url = "/package/"+p+"-"+v
       var dest_url     = "/package/"+p+"-"+v+ "/" + loc.rest
-      var link1 = atag(dest_url, dest_url)
-      var link2 = atag(contents_url, contents_url)
-      html = html.replace('@link1', link1)
-      html = html.replace('@link2', link2)
-      console.log("html:", html)
+
+      var links = [ { href: dest_url, text: dest_url },
+                    { href: contents_url, text: contents_url } ]
+
+      var html = "Alternative links:" + html_links_list(links)
+
       var div = document.createElement('div')
       div.innerHTML = html
       $("#content").append(div)
@@ -491,17 +540,6 @@ function find_alternative_docs(loc, onSuccess, onFailure) {
     },
     onFailure
   )
-}
-
-function xfind_latest_docs(loc, onSuccess, onFailure) {
-  var get_vers = function(onSuccess) {
-                   fetch_package_versions(
-                     loc.package,
-                     function(versions) { onSuccess(versions.reverse()) },
-                     onFailure)
-  }
-
-  find_latest_docs(loc, get_vers, onSuccess, onFailure);
 }
 
 function main() {
