@@ -31,4 +31,5 @@ On `hackage.haskell.org`:
 On `haskellnews.org`:
 
 * Links to `hdiff.luite.com` added for new package uploads
+- Buttons added to view individual sections
 
