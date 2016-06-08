@@ -151,7 +151,6 @@ function FetchUrl(url, onDone) {
     http.send();
 }
 
-
 function fetch_package_versions(package, onSuccess, onFailure) {
   var href = window.location.href
   var proto = href.split(':', 2)[0]
@@ -173,7 +172,6 @@ function fetch_package_versions(package, onSuccess, onFailure) {
       onFailure("status: " + xhr.status)
     }
   })
-
 }
 
 function cached_versions(loc) {
@@ -334,7 +332,9 @@ function build_hdiff_options(loc, versions) {
     }
     select.appendChild(opt)
   }
-  if (0) { // not ready for this yet
+
+  // add the empty repo option if this is first version
+  if (versions[0] == loc.version) {
     var opt = document.createElement("option")
     opt.value=""
     opt.innerHTML = "(empty repo)"
