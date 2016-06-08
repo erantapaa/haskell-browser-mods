@@ -67,8 +67,12 @@ function parse_url(url) {
   // all the parts beyond the package-version part
   loc.rest = parts.slice(2).join("/") + loc.fragment
 
+  loc.area = "unknown"
+
   if (parts.length < 3) {
     loc.area = "contents"
+  } else if (parts[2] == "candidate") {
+    loc.candidate = 1
   } else if (parts.length >= 4) {
       var x = parts[3]
       if (x == "src") {
@@ -602,11 +606,24 @@ function install_hot_keys(loc) {
   document.onkeypress = function (e) { handle_keypress(e,loc); return false }
 }
 
+function install_candidate_link(loc) {
+  // install a Candidate link in #page-menu
+  var url = loc_contents_url(loc)
+  $("#page-menu").prepend( '<li>' + "<a href='" + url + "' style='color:red'> Candidate</a>")
+}
+
 function main() {
   var loc = parse_full_url(window.location.href)
   console.log(loc)
 
   if (!loc) return;
+
+  if ((loc.area == "unknown") && loc.candidate) {
+    console.log("about to install candidate link")
+    install_candidate_link(loc)
+  } else {
+    console.log("not a candidate:", loc)
+  }
 
   if (loc.area == "contents") {
     if (!loc.version) {
