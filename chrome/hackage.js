@@ -90,6 +90,10 @@ function parse_url(url) {
   return loc
 }
 
+function loc_contents_url(loc) {
+  return loc_package_base_url(loc)
+}
+
 function loc_package_base_url(loc) {
   if (loc.version) {
     return  "/package/" + loc.package + "-" + loc.version
@@ -205,6 +209,7 @@ function fixup_index_link(loc) {
   // in div package-header look for doc-index.html
   UrlExists(all_url, function() {
                        console.log("fixup_index_link: updating Index url")
+                       loc.best_index_url = "doc-index-All.html"
                        $("a[href='doc-index.html']")
                          .attr("href", "doc-index-All.html")
                      },
@@ -542,9 +547,65 @@ function find_alternative_docs(loc, onSuccess, onFailure) {
   )
 }
 
+function toggle_classes(classNames, on, off) {
+  var names = classNames.split(' ')
+  console.log("toggle_classes:", names, on, off)
+  var newNames = []
+  var found = false
+  for (var i = 0; i < names.length; i++) {
+    if (names[i] == on) {
+      if (found) contineu
+      found = true
+      newNames.push(off)
+    } else if (names[i] == off) {
+      if (found) contineu
+      found = true
+      newNames.push(on)
+    } else {
+      newNames.push(names[i])
+    }
+  }
+  console.log("toggled:", newNames)
+  return newNames.join(' ')
+}
+
+function toggle_synopsis(e) {
+  // secton.syn show <-> hide
+  // control.syn expander <-> collapser
+  console.log("--- here in toggle synopsis")
+  $("#section\\.syn").first().each(function() {
+    this.className = toggle_classes(this.className, "hide", "show")
+  })
+  $("#control\\.syn").first().each(function() {
+    this.className = toggle_classes(this.className, "expander", "collapser")
+  })
+}
+
+function handle_keypress(e,loc) {
+  var ch = (typeof e.which == "number") ? e.which : e.keyCode
+  console.log("got char code:", ch)
+  if (ch == 115) {
+    console.log("--- toggling synopsis")
+    toggle_synopsis(e)
+  } else if (ch == 99) {
+    console.log("--- goto contents")
+    window.location.href = loc_contents_url(loc)
+  } else if (ch == 105) {
+    console.log("--- goto index")
+    var dest = loc.best_index_url || "doc-index.html"
+    window.location.href = dest
+  }
+}
+
+function install_hot_keys(loc) {
+  console.log("--- install handle_keypress")
+  document.onkeypress = function (e) { handle_keypress(e,loc); return false }
+}
+
 function main() {
   var loc = parse_full_url(window.location.href)
   console.log(loc)
+
   if (!loc) return;
 
   if (loc.area == "contents") {
@@ -554,23 +615,30 @@ function main() {
       loc2 = loc
     }
     visiting_contents_page(loc2)
-    return
   }
 
+  var on_not_found = false
   if (loc.area == "doc-index" || loc.area == "docs-mod" || loc.area == "docs-src") {
     // check if we're on a Not found page
-    if (on_not_found_page(loc)) {
-      return; // do not run normal visiting functions
+    on_not_found = on_not_found_page(loc)
+  }
+
+ if (!on_not_found) {
+   if (loc.area == "doc-index") {
+      console.log("in docs-index")
+      visiting_doc_index(loc)
+    } else if (loc.area == "docs-mod") {
+      console.log("in docs-mods")
+      visiting_docs_mod(loc);
     }
   }
 
- if (loc.area == "doc-index") {
-    console.log("in docs-index")
-    visiting_doc_index(loc)
-  } else if (loc.area == "docs-mod") {
-    console.log("in docs-mods")
-    visiting_docs_mod(loc);
+  // install hot-keys
+  console.log("area:", loc.area)
+  if ( loc.area == "docs-mod" ) {
+    install_hot_keys(loc)
   }
+
 }
 
 if (typeof document === 'undefined') {
