@@ -492,7 +492,10 @@ function visiting_doc_index(loc) {
 function visiting_docs_mod(loc) {
   // fixup the [Index] link
   console.log("in visiting_docs_mod")
+  insert_css("ocean-patch.css")
   fixup_index_link(loc)
+  // fixup the synopsis div
+  $("#synopsis").addClass("synopsis-right")
 }
 
 function on_not_found_page(loc) {
@@ -551,25 +554,45 @@ function find_alternative_docs(loc, onSuccess, onFailure) {
   )
 }
 
-function toggle_classes(classNames, on, off) {
+function set_classes(classNames, on, off) {
   var names = classNames.split(' ')
-  console.log("toggle_classes:", names, on, off)
   var newNames = []
   var found = false
   for (var i = 0; i < names.length; i++) {
     if (names[i] == on) {
-      if (found) contineu
+      if (found) continue
+      found = true
+      newNames.push(on)
+    } else if (names[i] == off) {
+      continue
+    } else {
+      console.log("adding", names[i], names[i] == on, names[i] == off)
+      newNames.push(names[i])
+    }
+  }
+  if (!found) {
+    newNames.push(on)
+  }
+  return newNames.join(' ')
+}
+
+function toggle_classes(classNames, on, off) {
+  var names = classNames.split(' ')
+  var newNames = []
+  var found = false
+  for (var i = 0; i < names.length; i++) {
+    if (names[i] == on) {
+      if (found) continue
       found = true
       newNames.push(off)
     } else if (names[i] == off) {
-      if (found) contineu
+      if (found) continue
       found = true
       newNames.push(on)
     } else {
       newNames.push(names[i])
     }
   }
-  console.log("toggled:", newNames)
   return newNames.join(' ')
 }
 
@@ -577,12 +600,34 @@ function toggle_synopsis(e) {
   // secton.syn show <-> hide
   // control.syn expander <-> collapser
   console.log("--- here in toggle synopsis")
+
+  // determine the size of #synopsis
+  var syndiv = document.getElementById("synopsis")
+
   $("#section\\.syn").first().each(function() {
     this.className = toggle_classes(this.className, "hide", "show")
   })
   $("#control\\.syn").first().each(function() {
     this.className = toggle_classes(this.className, "expander", "collapser")
   })
+
+  var section_syn = document.getElementById("section.syn")
+  var expanding = section_syn.className.indexOf("show") >= 0
+  // console.log("expanding:", expanding)
+  if (expanding) {
+    // console.log("after width:", syndiv.getBoundingClientRect().width)
+    // console.log("window width: ",  $(window).width())
+    var syn_width = syndiv.getBoundingClientRect().width
+    var window_width = $(window).width()
+    if (syn_width >= window_width) {
+      syndiv.className = set_classes(syndiv.className, "synopsis-left", "synopsis-right")
+    } else {
+      syndiv.className = set_classes(syndiv.className, "synopsis-right", "synopsis-left")
+    }
+  } else {
+    // collapsing - always set to synopsis-left
+    syndiv.className = set_classes(syndiv.className, "synopsis-right", "synopsis-left")
+  }
 }
 
 function handle_keypress(e,loc) {

@@ -1,0 +1,17 @@
+.no-frame .synopsis-right {
+  display: block;
+  position: fixed;
+  right: 0;
+  height: 80%;
+  top: 10%;
+  padding: 0;
+}
+
+.no-frame .synopsis-left {
+  display: block;
+  position: fixed;
+  left: 0;
+  height: 80%;
+  top: 10%;
+  padding: 0;
+}

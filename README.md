@@ -30,6 +30,7 @@ On `hackage.haskell.org`:
 * Links to doc-index.html changed to doc-index-All.html when the latter exists
 - Hot key support to jump to the index and contents pages and toggle synopsis section.
 - Warn if on a candidate doc page.
+- Fix expansion of Synopsis secton if it's too wide
 
 On `haskellnews.org`:
 
