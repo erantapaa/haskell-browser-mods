@@ -3,7 +3,7 @@
 
 Inspired by and icons borrowed from [hackage-fu](https://github.com/statusfailed/hackage-fu).
 
-This is a simple Chrome browser extension to make navigating around the
+This is a simple Chrome/Safari browser extension to make navigating around the
 Haskell interwebs more convenient. It modifies pages on various Haskell-related
 websites to create inter-site links, add information and generally making it
 easier to find and search for information.

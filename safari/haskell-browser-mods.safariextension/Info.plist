@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>Erik Rantapaa</string>
+	<key>Builder Version</key>
+	<string>10601.6.17</string>
+	<key>CFBundleDisplayName</key>
+	<string>haskell-browser-mods</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yourcompany.haskell-browser-mods</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict>
+			<key>End</key>
+			<array>
+				<string>main.js</string>
+			</array>
+		</dict>
+	</dict>
+	<key>Description</key>
+	<string>Mods to assist </string>
+	<key>DeveloperIdentifier</key>
+	<string>0000000000</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict>
+			<key>Allowed Domains</key>
+			<array>
+				<string>hdiff.luite.com</string>
+				<string>haskellnews.org</string>
+				<string>hackage.haskell.com</string>
+			</array>
+			<key>Include Secure Pages</key>
+			<true/>
+			<key>Level</key>
+			<string>Some</string>
+		</dict>
+	</dict>
+	<key>Website</key>
+	<string>https://github.com/erantapaa/haskell-browser-mods</string>
+</dict>
+</plist>
