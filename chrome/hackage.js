@@ -695,11 +695,9 @@ function main() {
     }
   }
 
-  // install hot-keys
+  // install hot-keys - disabled for now
   console.log("area:", loc.area)
-  if ( loc.area == "docs-mod" ) {
-    install_hot_keys(loc)
-  }
+  // if ( loc.area == "docs-mod" ) { install_hot_keys(loc) }
 
 }
 

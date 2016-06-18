@@ -40,7 +40,7 @@
 			<array>
 				<string>hdiff.luite.com</string>
 				<string>haskellnews.org</string>
-				<string>hackage.haskell.com</string>
+				<string>hackage.haskell.org</string>
 			</array>
 			<key>Include Secure Pages</key>
 			<true/>
