@@ -647,8 +647,15 @@ function handle_keypress(e,loc) {
 }
 
 function install_hot_keys(loc) {
-  console.log("--- install handle_keypress")
-  document.onkeypress = function (e) { handle_keypress(e,loc); return false }
+  console.log("--- installing hot keys")
+  // document.onkeypress = function (e) { handle_keypress(e,loc); return false }
+  Mousetrap.bind("s", toggle_synopsis )
+  Mousetrap.bind("c", function() { window.location.href = loc_contents_url(loc) })
+  Mousetrap.bind("i", function() {
+                        console.log("... going to the index")
+                        var dest = loc.best_index_url || "doc-index.html"
+                        window.location.href = dest
+                      })
 }
 
 function install_candidate_link(loc) {
@@ -695,9 +702,9 @@ function main() {
     }
   }
 
-  // install hot-keys - disabled for now
+  // install hot-keys
   console.log("area:", loc.area)
-  // if ( loc.area == "docs-mod" ) { install_hot_keys(loc) }
+  if ( loc.area == "docs-mod" ) { install_hot_keys(loc) }
 
 }
 

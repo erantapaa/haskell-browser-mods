@@ -23,7 +23,7 @@ function init() {
   } else if (where.match('hackage.haskell.org/package')) {
     console.log("I'm in hackage!")
     insert_script("jquery-1.12.4.min.js")
-    // insert_css("ocean-patch.css")
+    insert_css("ocean-patch.css")
     // check if on index page
     if (where.match("docs/doc-index(-All)?.html")) {
       console.log("=== in the doc-index area")
@@ -32,6 +32,7 @@ function init() {
     } else {
       console.log("=== not in the doc-index area")
     }
+    insert_script("mousetrap.min.js")
     insert_script("hackage.js")
   } else {
     console.log("=== where am I???", where)
