@@ -20,6 +20,10 @@ var sections = [
     label: "Stack Overflow",
     url: 'http://stackoverflow.com/'
   },
+  { id: 'show_github',
+    label: "Github",
+    url: 'https://github.com/'
+  },
   { id: 'show_lpaste',
     label: "lpaste",
     url: 'http://lpaste.net/'
