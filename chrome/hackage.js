@@ -446,7 +446,6 @@ function find_latest_docs(loc, get_versions, onSuccess, onFailure) {
 function insert_script(resource) {
   var s = document.createElement('script');
   s.src = chrome.extension.getURL(resource);
-  // s.onload = function() { this.parentNode.removeChild(this); };
   document.head.appendChild(s);
 }
 
@@ -483,7 +482,7 @@ function visiting_doc_index(loc) {
     //  <script src="awesomplete.js"></script>
     //  <script src="main.js"></script>
     console.log("=== in visiting_doc_index")
-    insert_script("jquery-1.12.4.min.js")
+    insert_script("jquery.min.js")
     insert_css("awesomplete.css")
     insert_script("haddock-index.js")
   }
@@ -647,8 +646,14 @@ function handle_keypress(e,loc) {
 }
 
 function install_hot_keys(loc) {
-  console.log("--- install handle_keypress")
-  document.onkeypress = function (e) { handle_keypress(e,loc); return false }
+  console.log("--- installing hot keys")
+  Mousetrap.bind("s", toggle_synopsis )
+  Mousetrap.bind("c", function() { window.location.href = loc_contents_url(loc) })
+  Mousetrap.bind("i", function() {
+                        console.log("... going to the index")
+                        var dest = loc.best_index_url || "doc-index.html"
+                        window.location.href = dest
+                      })
 }
 
 function install_candidate_link(loc) {
@@ -695,10 +700,10 @@ function main() {
     }
   }
 
-  // install hot-keys - disabled for now
   console.log("area:", loc.area)
-  // if ( loc.area == "docs-mod" ) { install_hot_keys(loc) }
-
+  if ( loc.area == "docs-mod" ) {
+    install_hot_keys(loc)
+  }
 }
 
 if (typeof document === 'undefined') {

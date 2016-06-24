@@ -648,7 +648,6 @@ function handle_keypress(e,loc) {
 
 function install_hot_keys(loc) {
   console.log("--- installing hot keys")
-  // document.onkeypress = function (e) { handle_keypress(e,loc); return false }
   Mousetrap.bind("s", toggle_synopsis )
   Mousetrap.bind("c", function() { window.location.href = loc_contents_url(loc) })
   Mousetrap.bind("i", function() {

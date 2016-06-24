@@ -1,4 +1,26 @@
 
+
+// return true if href is an Other link
+function show_other(href) {
+  for (var i = 0; i < sections.length; i++) {
+    var prefix = sections[i].url
+    if (prefix && href.substring(0,prefix.length) == prefix) {
+      return false;
+    }
+  }
+  return true
+}
+
+function show_mixed(href) {
+  return true
+}
+
+function show_begins_with(prefix) {
+  return function(href) {
+    return (href.substring(0, prefix.length) == prefix)
+  }
+}
+
 var sections = [
   { id: 'show_twitter',
     label: "Twitter",
@@ -28,9 +50,13 @@ var sections = [
     label: "lpaste",
     url: 'http://lpaste.net/'
   },
+  { id: 'show_other',
+    label: 'Other',
+    matches: show_other
+  },
   { id: 'show_all',  // this is not created
     label: "Mixed",
-    url: '',
+    matches: show_mixed
   },
 ]
 
@@ -78,24 +104,25 @@ function handleToggle(sect_id) {
 
   // find the url prefix for the section
 
-  var prefix;
   var found;
   for (var i = 0; i < sections.length; i++) {
     if (sections[i].id == sect_id) {
-      prefix = sections[i].url
-      found = true
+      found = sections[i]
       break
     }
   }
 
-  console.log("prefix:", prefix)
-  var trace = sect_id == "show_hackage"
-
   if (found) {
+    if ("matches" in found) {
+      show_fn = found.matches
+    } else {
+      show_fn = show_begins_with(found.url)
+    }
+    console.log("found.id: " + found.id)
     $("table.table a[href]").not("[ignore]").each(function() {
       var href = $(this).attr("href")
-      var show = prefix == href.substring(0, prefix.length)
-      $(this).parent().parent().toggle(show)
+      var which = show_fn(href)
+      $(this).parent().parent().toggle(which)
     })
   }
 }
@@ -128,7 +155,7 @@ function handleToggle(sect_id) {
   var ul = document.getElementsByClassName("nav-pills")[0]
   for (var i = 0; i < sections.length; i++) {
     // skip over the Mixed button
-    if (sections[i].url == "") continue
+    if (sections[i].id == "show_all") continue // do not create the "Mixed" button
 
     var li = document.createElement("li")
     var a = document.createElement("a")

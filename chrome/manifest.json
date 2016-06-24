@@ -12,11 +12,12 @@
   "homepage_url": "https://github.com/statusfailed/hackage-fu",
 
   "web_accessible_resources": [
-    "hn-injected.js",
+    "haskellnews.js",
     "haddock-index.js",
     "awesomplete.css",
-    "jquery-1.12.4.min.js",
-    "ocean-patch.css"
+    "jquery.min.js",
+    "ocean-patch.css",
+    "mousetrap.min.js"
   ],
 
   "content_scripts": [
@@ -24,11 +25,11 @@
     "matches": [ "*://hdiff.luite.com/cgit*" ],
     "run_at": "document_end"
   },
-  { "js": [ "jquery.min.js", "hackage.js" ],
+  { "js": [ "jquery.min.js", "mousetrap.min.js", "hackage.js" ],
     "matches": [ "*://hackage.haskell.org/package/*" ],
     "run_at": "document_end"
   },
-  { "js": [ "jquery.min.js", "hn.js" ],
+  { "js": [ "inject-haskellnews.js" ],
     "matches": [ "*://haskellnews.org/*" ],
     "run_at": "document_end"
   }
