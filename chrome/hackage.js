@@ -1,5 +1,5 @@
 
-// console.log("here in hackage.js")
+console.log("here in hackage.js")
 
 function url_path(url) {
   // trim the protocol and domain from the front of a url
@@ -282,7 +282,7 @@ function visiting_contents_page(m) {
 
   var inner = rev_anchor + '&nbsp;'
   $("table.properties tbody").append(
-   '<tr><th>Additional Info</th><td id="hdiff-td">' + inner + '</td></tr>'
+   '<tr><th><a name="additional-info"></a>Additional Info</th><td id="hdiff-td">' + inner + '</td></tr>'
   )
 
   var versions = cached_versions(loc)
@@ -360,7 +360,7 @@ function fmt_doc_cell(loc, found, which, url) {
 
 function add_doc_index_control(loc) {
   $("table.properties tbody").append(
-   '<tr><th>Doc Index Links</th><td id="doc-index-cell"> (Pending)</td></tr>'
+   '<tr><th><a name="doc-index"></a>Doc Index</th><td id="doc-index-cell"> (Pending)</td></tr>'
   )
 
   var success = function(found) {
@@ -476,11 +476,6 @@ function visiting_doc_index(loc) {
     div.innerHTML = html
     $("#content").append(div)
   } else {
-    // inject the following tags:
-    //  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    //  <link rel="stylesheet" type="text/css" href="awesomplete.css">
-    //  <script src="awesomplete.js"></script>
-    //  <script src="main.js"></script>
     console.log("=== in visiting_doc_index")
     insert_script("jquery.min.js")
     insert_css("awesomplete.css")

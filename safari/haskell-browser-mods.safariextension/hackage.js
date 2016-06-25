@@ -282,7 +282,7 @@ function visiting_contents_page(m) {
 
   var inner = rev_anchor + '&nbsp;'
   $("table.properties tbody").append(
-   '<tr><th>Additional Info</th><td id="hdiff-td">' + inner + '</td></tr>'
+   '<tr><th><a name="additional-info"></a>Additional Info</th><td id="hdiff-td">' + inner + '</td></tr>'
   )
 
   var versions = cached_versions(loc)
@@ -360,7 +360,7 @@ function fmt_doc_cell(loc, found, which, url) {
 
 function add_doc_index_control(loc) {
   $("table.properties tbody").append(
-   '<tr><th>Doc Index Links</th><td id="doc-index-cell"> (Pending)</td></tr>'
+   '<tr><th><a name="doc-index"></a>Doc Index</th><td id="doc-index-cell"> (Pending)</td></tr>'
   )
 
   var success = function(found) {
@@ -476,16 +476,8 @@ function visiting_doc_index(loc) {
     div.innerHTML = html
     $("#content").append(div)
   } else {
-    // inject the following tags:
-    //  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    //  <link rel="stylesheet" type="text/css" href="awesomplete.css">
-    //  <script src="awesomplete.js"></script>
-    //  <script src="main.js"></script>
     console.log("=== in visiting_doc_index")
-    // injection is done in main for Safari
-    // insert_script("jquery-1.12.4.min.js")
-    // insert_css("awesomplete.css")
-    // insert_script("haddock-index.js")
+    // injection of css and scripts is done in main.js
   }
 }
 
@@ -701,10 +693,10 @@ function main() {
     }
   }
 
-  // install hot-keys
   console.log("area:", loc.area)
-  if ( loc.area == "docs-mod" ) { install_hot_keys(loc) }
-
+  if ( loc.area == "docs-mod" ) {
+    install_hot_keys(loc)
+  }
 }
 
 if (typeof document === 'undefined') {
