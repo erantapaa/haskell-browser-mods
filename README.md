@@ -10,7 +10,7 @@ easier to find and search for information.
 
 I consider the project to still be in its "proof of concept" stage and the code to be of
 alpha quality. Still, I've found it useful and I use it on a daily basis.  Suggestions,
- bug reports and PR's are welcome.
+comments, bug reports and PR's are welcome.
 
 ## Installation
 
@@ -31,7 +31,7 @@ Here is an overview of the what the extension does.
 
 __Example:__ http://haskellnews.org
 
-#### hdiff.luite.org
+#### hdiff.luite.com
 
 When visiting a diff page on hdiff.luite.org the Hackage URL at the top of the page is made clickable.
 
@@ -41,9 +41,9 @@ __Example:__ http://hdiff.luite.com/cgit/uri-bytestring/diff/
 
 When visiting the front page for a package, several new links are added:
 
-- link added to the package's reverse dependencies
+- link added to packdeps.haskellers.com for the package's reverse dependencies
 - link added to hdiff.luite.com` for source diffs
-- link added to the all index page (*)
+- link added to the "all index" page (*)
 - if the Source Repository is a `git:github.com/...` link it will be transformed
 to `https://github.com/...` so you can click on it.
 
@@ -51,13 +51,15 @@ __Example:__ http://hackage.haskell.org/package/persistent-2.5#additional-info
 
 See the "Additional Links" and "Doc Index" sections for the new links.
 
-(*) If documentation for the specific version of the package is not
+(*) The "all index" page is the page which contains a list of all names defined in the package,
+and this page may either be `docs-index.html` or `docs-index-All.html`.
+
+Moreover, if documentation for the specific version of the package is not
 available, the "Doc Index" section will display links for the
 latest preceding version for which docs exist.
 
-For the example link, the docs for `persistent-2.5` do not exist. Therefore
-the "Doc Index" links will navigate to the docs for version 2.2.4 which is the
-most recent preceding version which has documentation.
+In the case of the example link, the docs for `persistent-2.5` do not exist. Therefore
+the "Doc Index" links point to version 2.2.4.
 
 #### haskell.org - non-existent doc pages
 
