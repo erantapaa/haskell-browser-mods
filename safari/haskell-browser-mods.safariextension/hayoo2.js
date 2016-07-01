@@ -132,18 +132,16 @@ function fix_descriptions() {
 
         // insert expander span in the result-title paragraph
 
-        var control  = document.createElement("button")
-        control.className = "ctl-collapsed"
+        var control  = document.createElement("span")
+        control.className = "label label-collapsed"
         control.innerHTML = 'expand'
         var this_content = this
         control.onclick = function(e) {
           e.preventDefault()
-          console.log("=== got clicked")
-          var current = this.className
-          if (current == "ctl-collapsed") {
-            this.className = "ctl-expanded"
+          if ($(this).hasClass("label-collapsed")) {
+            $(this).removeClass("label-collapsed").addClass("label-expanded")
           } else {
-            this.className = "ctl-collapsed"
+            $(this).removeClass("label-expanded").addClass("label-collapsed")
           }
           // toggle children of the .more div
           $(this).parent().parent().find(".more").children().toggle()
@@ -158,5 +156,5 @@ function fix_descriptions() {
 }
 
 console.log("== in hayoo2.js")
-fix_descriptions()
+$().ready(fix_descriptions)
 

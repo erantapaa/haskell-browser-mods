@@ -1,7 +1,7 @@
 
 // REST API endpoint which returns the latest version of a package that has docs.
 
-var LATEST_API_ENDPOINT = "http://104.236.145.46:3001/latest/"
+var LATEST_API_ENDPOINT = "";
 
 console.log("loaded hayoo.js")
 
