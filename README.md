@@ -83,7 +83,7 @@ __Example:__ http://hackage.haskell.org/package/blaze-html-0.8.1.1/docs/doc-inde
 
 #### hayoo.fh-wedel.de
 
-(Safari only) Expand / collapse controls added to descriptions.
+Expand / collapse control added for doc sections.
 
 __Example:__ http://hayoo.fh-wedel.de/?query=delete
 

@@ -26,28 +26,34 @@
   ],
 
   "content_scripts": [
-  { "js": [ "hdiff.js" ],
+  { 
     "matches": [ "*://hdiff.luite.com/cgit*" ],
+    "js": [ "hdiff.js" ],
     "run_at": "document_end"
   },
-  { "js": [ "jquery.min.js", "mousetrap.min.js", "hackage.js" ],
+  { 
     "matches": [ "*://hackage.haskell.org/package/*" ],
+    "js": [ "jquery.min.js", "mousetrap.min.js", "hackage.js" ],
     "run_at": "document_end"
   },
-  { "js": [ "inject-haskellnews.js" ],
+  { 
     "matches": [ "*://haskellnews.org/*" ],
+    "js": [ "inject-haskellnews.js" ],
     "run_at": "document_end"
-  } /*,
-  { "js": [ "jquery.min.js", "hayoo.js", "hayoo2.js" ],
+  },
+  { 
     "matches": [ "*://hayoo.fh-wedel.de/*" ],
+    "js": [ "jquery.min.js", "hayoo.js", "hayoo2.js" ],
+    "css": [ "hayoo.css" ],
     "run_at": "document_end"
-  } */
+  }
   ],
 
   "permissions": [ "tabs",
                    "*://hdiff.luite/cgit*",
                    "*://hackage.haskell.org/*",
-                   "*://haskellnews.org/*"
+                   "*://haskellnews.org/*",
+                   "*://hayoo.fh-wedel.de/*"
                  ],
 
   "manifest_version": 2

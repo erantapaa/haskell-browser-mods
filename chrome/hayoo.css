@@ -27,3 +27,6 @@
   background-color: white;
 }
 
+button:focus {outline:0;}
+
+
