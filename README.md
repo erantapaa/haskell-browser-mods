@@ -32,7 +32,7 @@ Steps to load an extension into Safari from a directory:
 
 __Caveat:__ This extension works by injecting JS + CSS and by modifying
 the DOM of the pages of various Haskell-related websites.
-It goes without saying that the extension may cease to work
+It goes without saying that the features may cease to work
 if the structure or pages of these sites change.
 
 ## Tour
