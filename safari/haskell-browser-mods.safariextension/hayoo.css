@@ -1,0 +1,25 @@
+.more-div {
+  position: absolute;
+  margin-left: 2px;
+  margin-top: 4px;
+}
+
+.collapser {
+  background-image: url(minus.gif);
+  background-repeat: no-repeat;
+}
+.expander {
+  background-image: url(plus.gif);
+  background-repeat: no-repeat;
+}
+.collapser, .expander {
+  padding-left: 14px;
+  margin-left: -14px;
+  cursor: pointer;
+}
+
+p.caption.collapser,
+p.caption.expander {
+  background-position: 0 0.4em;
+}
+
