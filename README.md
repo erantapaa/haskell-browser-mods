@@ -81,3 +81,9 @@ When on a doc index page, pressing ESC will being up an autocomplete search box.
 
 __Example:__ http://hackage.haskell.org/package/blaze-html-0.8.1.1/docs/doc-index-All.html
 
+#### hayoo.fh-wedel.de
+
+(Safari only) Expand / collapse controls added to descriptions.
+
+__Example:__ http://hayoo.fh-wedel.de/?query=delete
+

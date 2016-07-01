@@ -1,4 +1,8 @@
 
+// REST API endpoint which returns the latest version of a package that has docs.
+
+var LATEST_API_ENDPOINT = "http://104.236.145.46:3001/latest/"
+
 console.log("loaded hayoo.js")
 
 function fix_hackage_links() {
@@ -21,13 +25,11 @@ function fix_hackage_links() {
   }
 }
 
-var LATEST_SERVER = "http://104.236.145.46:3001/latest/"
-
 // lookup the latest version with docs of a package on Hackage
 // next is a callback and is called with the returned version
 function lookup_latest(pkgname, next) {
   var http = new XMLHttpRequest()
-  var query = LATEST_SERVER + pkgname
+  var query = LATEST_API_ENDPOINT + pkgname
   http.open("GET", query, true)
   var complete = function(e) {
     if (http.status == 200) {
@@ -83,27 +85,7 @@ function goto_hackage(url, e) {
   }
 }
 
-function done(e) {
-  console.log("=== done (hayoo.js): ", e.target)
+if (LATEST_API_ENDPOINT) {
+  fix_hackage_links()
 }
-
-function doit(url) {
-  var http = new XMLHttpRequest()
-  http.open("GET", url, true)
-  http.addEventListener("load", done, false);
-  http.send()
-}
-
-function makeMores() {
-  console.log("in my makeMores")
-}
-
-function countContentDivs() {
-  var divs = document.getElementsByClassName("content")
-  console.log("=== count of content divs:", divs.length)
-}
-
-fix_hackage_links()
-countContentDivs()
-
 
