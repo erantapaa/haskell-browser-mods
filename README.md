@@ -24,7 +24,7 @@ For Safari users, load the extension located in the directory `safari/haskell-br
 
 Steps to load an extension into Safari from a directory:
 
-1.[Enable the Develop menu](http://myownapp.com/manuals/tutorial_create_safariextension/#Enable%20Develop%20menu)
+1. [Enable the Develop menu](http://myownapp.com/manuals/tutorial_create_safariextension/#Enable%20Develop%20menu)
 2. [Enable Extensions](http://myownapp.com/manuals/tutorial_create_safariextension/#Enable%20Extensions)
 3. [Show the Extension Builder](http://myownapp.com/manuals/tutorial_create_safariextension/#Create%20an%20Extension)
 4. Click on "+" in Extension Build and select "Add Extension"
