@@ -14,11 +14,16 @@ comments, bug reports and PR's are welcome.
 
 ## Installation
 
-The extension is currently available for Sarafi and Chrome.
+The extension is currently available for Safari and Chrome.
 
 For Chrome users, load the unpacked extension located in the `chrome` directory.
 
 For Safari users, load the extension located in the directory `safari/haskell-browser-mods.safariextension`.
+
+Caveat: This extension works by injecting JS + CSS and by modifying
+the DOM of the pages of various Haskell-related websites.
+It goes without saying that the extension may cease to work
+if the structure of these sites change.
 
 ## Tour
 
@@ -94,16 +99,16 @@ and this causes problems when accessing latest-version URLs on Hackage.
 
 Example:
 
-1. Page contains the linke `https://hackage.haskell.org/package/base/docs/Prelude.html#v:not`
+1. A page contains the link `https://hackage.haskell.org/package/base/docs/Prelude.html#v:not`
 with the intention of it going to the documentation for the `not` function in the latest version of `base` package.
 
-2. Hackage issues redirect to a version specific page like `https://hackage.haskell.org/package/base-4.9.0.0/docs/Prelude.html`
+2. When Safari follows the link Hackage issues a redirect to a version specific page like `https://hackage.haskell.org/package/base-4.9.0.0/docs/Prelude.html`
 
 3. Safari follows the redirect but does not add the the `#v:not` fragment to the end of the url.
 Consequently the page is not scrolled to the definition of the `not` function.
 
 To mitigate this problem, the mods for the hayoo site have the ability to call a REST api service
-to get the latest version of a package. If the variable `LATEST_API_ENDPOINT` is set, 
+to get the latest version of a package. If the variable `LATEST_API_ENDPOINT` is set
 a link to Hackage without an explicit package version will be translated via the service to one
 with a version.  See the directory `latest-server` for more details on setting up the server.
 
