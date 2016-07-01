@@ -34,6 +34,7 @@ function parse_url(url) {
   // fragment:  url fragment (#...)
   //
   // rest:      parts [2..]
+  // parts:     url split on slashes - does not include fragment
   //
   // assume url has been stripped of protocol and domain.
 
@@ -66,6 +67,7 @@ function parse_url(url) {
 
   // all the parts beyond the package-version part
   loc.rest = parts.slice(2).join("/") + loc.fragment
+  loc.parts = parts
 
   loc.area = "unknown"
 
@@ -445,7 +447,7 @@ function find_latest_docs(loc, get_versions, onSuccess, onFailure) {
 
 function insert_script(resource) {
   var s = document.createElement('script');
-  s.src = chrome.extension.getURL(resource);
+  s.src = safari.extension.baseURI + resource
   document.head.appendChild(s);
 }
 
@@ -453,7 +455,7 @@ function insert_css(resource) {
   var link = document.createElement('link')
   link.rel = "stylesheet"
   link.type = "text/css"
-  link.href = chrome.extension.getURL(resource)
+  link.href = safari.extension.baseURI + resource
   document.head.appendChild(link)
 }
 
@@ -477,16 +479,14 @@ function visiting_doc_index(loc) {
     $("#content").append(div)
   } else {
     console.log("=== in visiting_doc_index")
-    insert_script("jquery.min.js")
-    insert_css("awesomplete.css")
-    insert_script("haddock-index.js")
+    // injection of css and scripts is done in main.js
   }
 }
 
 function visiting_docs_mod(loc) {
   // fixup the [Index] link
   console.log("in visiting_docs_mod")
-  insert_css("ocean-patch.css")
+  // insert_css("ocean-patch.css")
   fixup_index_link(loc)
   // fixup the synopsis div
   $("#synopsis").addClass("synopsis-right")
@@ -500,26 +500,85 @@ function on_not_found_page(loc) {
   }
 
   if (h1_text.match(/Not found/i)) {
-    var presentAlternative = function(alt) {
-      // insert a new div at the end
 
+    var html = 'Alternative links: <ul id="alt-links"></ul>'
+    var div = document.createElement('div')
+    div.setAttribute("id", "alt-div")
+    div.setAttribute("style", "display:none")
+    div.innerHTML = html
+    $("#content").append(div)
+
+    // set up async calls to add alternative links are they are found
+
+    if (loc.area == "docs-src") {
+      if (loc.parts.length == 5) {
+        var part4a = loc.module + ".html"
+        var dashmod = loc.module.replace(/\./g, "-")
+        var part4b = dashmod + ".html"
+
+        var prefix = "/package/" + loc.parts[1] + "/docs/src/"
+        if (part4a != loc.parts[4]) {
+          add_checked_alternative(1, prefix + part4a + loc.fragment)
+        }
+        if (part4b != loc.parts[4]) {
+          add_checked_alternative(1, prefix + part4b + loc.fragment)
+        }
+      }
+    }
+
+    add_checked_alternative(2, "/package/" + loc.parts[1])
+
+    var presentAlternative = function(alt) {
       var p = loc.package
       var v = alt.version
       var contents_url = "/package/"+p+"-"+v
       var dest_url     = "/package/"+p+"-"+v+ "/" + loc.rest
 
-      var links = [ { href: dest_url, text: dest_url },
-                    { href: contents_url, text: contents_url } ]
+      add_alternative(3, dest_url)
+      add_alternative(3, contents_url)
+    }
 
-      var html = "Alternative links:" + html_links_list(links)
-
-      var div = document.createElement('div')
-      div.innerHTML = html
-      $("#content").append(div)
-    };
     find_alternative_docs(loc, presentAlternative, reportFailure)
-    return True;  // signal that we're handling it
+    return true;  // signal that we're handling it
   }
+}
+
+function add_checked_alternative(priority, url) {
+  UrlExists(url, function() { add_alternative(priority, url) }
+               , function() { return }
+  )
+}
+
+function add_alternative(priority, url) {
+  var new_li = make_alternative_li(priority, url)
+  insert_alternative_li(priority, new_li)
+}
+
+function make_alternative_li(priority, url) {
+  var new_li = document.createElement("li")
+  new_li.setAttribute("data-priority", priority)
+  new_li.innerHTML = atag(url, url)
+  return new_li
+}
+
+function insert_alternative_li(priority, new_li) {
+  console.log("=== inserting alternative:", new_li)
+  // add an <li> at the right place
+  var ul = document.getElementById("alt-links")
+  if (!ul) return;
+  var li = ul.firstChild
+  while (li) {
+    var p = li.getAttribute("data-priority")
+    if (p > priority) break
+    li = li.nextSibling
+  }
+  if (li) {
+    ul.insertBefore(new_li, li)
+  } else {
+    ul.appendChild(new_li)
+  }
+  // make sure the alt-div is visible
+  $("#alt-div").show()
 }
 
 function reportFailure(msg) {
