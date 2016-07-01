@@ -16,14 +16,24 @@ comments, bug reports and PR's are welcome.
 
 The extension is currently available for Safari and Chrome.
 
-For Chrome users, load the unpacked extension located in the `chrome` directory.
+For Chrome users, follow the steps here to load the unpacked extension located in the `chrome` directory:
+
+- https://developer.chrome.com/extensions/getstarted#unpacked
 
 For Safari users, load the extension located in the directory `safari/haskell-browser-mods.safariextension`.
 
-Caveat: This extension works by injecting JS + CSS and by modifying
+Steps to load an extension into Safari from a directory:
+
+1.[Enable the Develop menu](http://myownapp.com/manuals/tutorial_create_safariextension/#Enable%20Develop%20menu)
+2. [Enable Extensions](http://myownapp.com/manuals/tutorial_create_safariextension/#Enable%20Extensions)
+3. [Show the Extension Builder](http://myownapp.com/manuals/tutorial_create_safariextension/#Create%20an%20Extension)
+4. Click on "+" in Extension Build and select "Add Extension"
+
+
+__Caveat:__ This extension works by injecting JS + CSS and by modifying
 the DOM of the pages of various Haskell-related websites.
 It goes without saying that the extension may cease to work
-if the structure of these sites change.
+if the structure or pages of these sites change.
 
 ## Tour
 
