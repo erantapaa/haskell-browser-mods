@@ -87,3 +87,23 @@ Expand / collapse control added for doc sections.
 
 __Example:__ http://hayoo.fh-wedel.de/?query=delete
 
+## Safari and Redirects
+
+Safari does not retain the hash part of the url when it encounters an redirect,
+and this causes problems when accessing latest-version URLs on Hackage.
+
+Example:
+
+1. Page contains the linke `https://hackage.haskell.org/package/base/docs/Prelude.html#v:not`
+with the intention of it going to the documentation for the `not` function in the latest version of `base` package.
+
+2. Hackage issues redirect to a version specific page like `https://hackage.haskell.org/package/base-4.9.0.0/docs/Prelude.html`
+
+3. Safari follows the redirect but does not add the the `#v:not` fragment to the end of the url.
+Consequently the page is not scrolled to the definition of the `not` function.
+
+To mitigate this problem, the mods for the hayoo site have the ability to call a REST api service
+to get the latest version of a package. If the variable `LATEST_API_ENDPOINT` is set, 
+a link to Hackage without an explicit package version will be translated via the service to one
+with a version.  See the directory `latest-server` for more details on setting up the server.
+

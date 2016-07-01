@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+if [ ! -e hoogle.tar.gz ]; then
+  curl http://hackage.haskell.org/packages/hoogle.tar.gz > .tmp.hoogle.tar.gz
+  mv .tmp.hoogle.tar.gz hoogle.tar.gz
+fi
+tar ztf hoogle.tar.gz | node insert-latest.js
+

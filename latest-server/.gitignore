@@ -1,0 +1,4 @@
+hoogle.tar.gz
+.tmp.*
+latest.db
+node_modules/
