@@ -119,6 +119,5 @@ Consequently the page is not scrolled to the definition of the `not` function.
 
 To mitigate this problem, the extension has the ability to call a REST api service
 to get the latest version of a package. If the variable `LATEST_API_ENDPOINT` is set,
-the extension will use the api to add a version to Hackage link without an explicit package version.
-See the directory `latest-server` for more details on setting up the server.
-
+the extension will use the api to add a version id to Hackage link without an explicit package version.
+See the directory `latest-server` for more details on setting up an api service.
