@@ -92,7 +92,7 @@ __Example:__ http://hackage.haskell.org/package/persistent-2.2.4/docs/Database-P
 
 #### haskell.org - package index pages
 
-When on a doc index page, pressing ESC will being up an autocomplete search box.
+When on a doc index page, pressing ESC will bring up an autocomplete search box.
 
 __Example:__ http://hackage.haskell.org/package/blaze-html-0.8.1.1/docs/doc-index-All.html
 
@@ -117,8 +117,8 @@ with the intention of it going to the documentation for the `not` function in th
 3. Safari follows the redirect but does not add the the `#v:not` fragment to the end of the url.
 Consequently the page is not scrolled to the definition of the `not` function.
 
-To mitigate this problem, the mods for the hayoo site have the ability to call a REST api service
-to get the latest version of a package. If the variable `LATEST_API_ENDPOINT` is set
-a link to Hackage without an explicit package version will be translated via the service to one
-with a version.  See the directory `latest-server` for more details on setting up the server.
+To mitigate this problem, the extension has the ability to call a REST api service
+to get the latest version of a package. If the variable `LATEST_API_ENDPOINT` is set,
+the extension will use the api to add a version to Hackage link without an explicit package version.
+See the directory `latest-server` for more details on setting up the server.
 
