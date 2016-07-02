@@ -447,7 +447,7 @@ function find_latest_docs(loc, get_versions, onSuccess, onFailure) {
 
 function insert_script(resource) {
   var s = document.createElement('script');
-  s.src = safari.extension.baseURI + resource
+  s.src = chrome.extension.getURL(resource);
   document.head.appendChild(s);
 }
 
@@ -455,7 +455,7 @@ function insert_css(resource) {
   var link = document.createElement('link')
   link.rel = "stylesheet"
   link.type = "text/css"
-  link.href = safari.extension.baseURI + resource
+  link.href = chrome.extension.getURL(resource)
   document.head.appendChild(link)
 }
 
@@ -479,7 +479,9 @@ function visiting_doc_index(loc) {
     $("#content").append(div)
   } else {
     console.log("=== in visiting_doc_index")
-    // injection of css and scripts is done in main.js
+    insert_css("awesomplete.css")
+    insert_script("jquery.min.js")
+    insert_script("haddock-index.js")
   }
 }
 
